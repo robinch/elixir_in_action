@@ -6,6 +6,23 @@ defmodule TodoListTest do
     assert TodoList.new() == %TodoList{}
   end
 
+  test 'new todo list with entries' do
+    entries = [
+      %{date: ~D[2018-11-08], title: "Dentist"},
+      %{date: ~D[2018-11-09], title: "Shopping"}
+    ]
+
+    todo_list = TodoList.new(entries)
+
+    entry1 = hd(TodoList.entries(todo_list, ~D[2018-11-08]))
+    assert entry1.date == ~D[2018-11-08]
+    assert entry1.title == "Dentist"
+
+    entry2 = hd(TodoList.entries(todo_list, ~D[2018-11-09]))
+    assert entry2.date == ~D[2018-11-09]
+    assert entry2.title == "Shopping"
+  end
+
   test 'add new entry' do
     todo =
       TodoList.new()
