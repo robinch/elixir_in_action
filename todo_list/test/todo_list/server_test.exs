@@ -1,9 +1,8 @@
 defmodule TodoList.ServerTest do
   use ExUnit.Case
 
-  test "test everything" do
+  test "delete a entry" do
     TodoList.Server.start()
-
     TodoList.Server.add_entry(%{date: ~D[2018-11-15], title: "Dentist"})
 
     entry = hd(TodoList.Server.entries(~D[2018-11-15]))

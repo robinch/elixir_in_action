@@ -21,7 +21,8 @@ defmodule TodoList.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
+      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
+      {:server_process, path: "../server_process"}
     ]
   end
 end
