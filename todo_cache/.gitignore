@@ -23,3 +23,5 @@ erl_crash.dump
 todo_cache-*.tar
 
 .elixir_ls/
+
+persist/
