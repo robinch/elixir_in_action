@@ -6,39 +6,33 @@ defmodule SimpleRegistry do
   end
 
   def register(name) do
-    GenServer.call(__MODULE__, {:register, name})
+    if :ets.insert_new(__MODULE__, {name, self()}) do
+      Process.link(whereis(__MODULE__))
+      :ok
+    else
+      :error
+    end
   end
 
   def whereis(name) do
-    GenServer.call(__MODULE__, {:whois, name})
+    case :ets.lookup(__MODULE__, name) do
+      [{^name, value}] -> value
+      [] -> nil
+    end
   end
 
   def init(_) do
     Process.flag(:trap_exit, true)
+    :ets.new(__MODULE__, [:public, :named_table])
+    :ets.insert_new(__MODULE__, {__MODULE__, self()})
     {:ok, %{}}
   end
 
-  def handle_call({:register, name}, {caller_pid, _}, registry) do
-    {reply, new_registry} =
-      if Map.get(registry, name) do
-        {:error, registry}
-      else
-        Process.link(caller_pid)
-        {:ok, Map.put(registry, name, caller_pid)}
-      end
+  def handle_info({:EXIT, terminated_pid, _reason}, state) do
+    :ets.match_object(__MODULE__, {:_, terminated_pid})
+    |> IO.inspect()
+    |> Enum.each(fn {name, _pid} -> :ets.delete(__MODULE__, name) end)
 
-    {:reply, reply, new_registry}
-  end
-
-  def handle_call({:whois, name}, _, registry) do
-    {:reply, Map.get(registry, name), registry}
-  end
-
-  def handle_info({:EXIT, terminated_pid, _reason}, registry) do
-    new_registry =
-      Enum.filter(registry, fn {_name, pid} -> pid != terminated_pid end)
-      |> Map.new()
-
-    {:noreply, new_registry}
+    {:noreply, state}
   end
 end
