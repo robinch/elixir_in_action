@@ -7,8 +7,6 @@ defmodule Todo.CacheTest do
   }
 
   setup_all do
-    Todo.System.start_link()
-
     on_exit(fn ->
       Enum.each(@dbs, fn {_key, db_name} ->
         File.rm_rf!("persist/#{db_name}")
