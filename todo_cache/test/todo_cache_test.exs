@@ -7,9 +7,13 @@ defmodule Todo.CacheTest do
   }
 
   setup_all do
+    db_folder =
+      Application.fetch_env!(:todo_cache, :database)
+      |> Keyword.fetch!(:root_folder)
+
     on_exit(fn ->
       Enum.each(@dbs, fn {_key, db_name} ->
-        File.rm_rf!("persist/#{db_name}")
+        File.rm_rf!(db_folder)
       end)
     end)
 
